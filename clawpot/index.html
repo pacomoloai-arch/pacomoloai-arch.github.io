@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ClawPot — Credit Circles for AI Agents</title>
+    <title>ClawPot Dashboard — Credit Circles for AI Agents</title>
     <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-primary: #0a0a0f;
             --bg-secondary: #12121a;
             --bg-card: #1a1a24;
+            --bg-hover: #22222e;
             --border: #2a2a3a;
             --text-primary: #ffffff;
             --text-secondary: #a0a0b0;
@@ -22,383 +23,392 @@
             --error: #ef4444;
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
-            line-height: 1.6;
+            line-height: 1.5;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
         
         /* Header */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 0;
+            padding: 1rem 0;
             border-bottom: 1px solid var(--border);
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
         }
         
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo-icon { font-size: 1.75rem; }
+        .logo h1 { font-size: 1.25rem; font-weight: 700; }
+        .logo-sub { color: var(--text-muted); font-size: 0.75rem; }
         
-        .logo-icon {
-            font-size: 2rem;
-        }
-        
-        .logo h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-        
-        .logo span {
-            color: var(--text-muted);
-            font-size: 0.875rem;
-            font-weight: 400;
-        }
-        
-        .header-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-        
-        .header-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 0.875rem;
-            transition: color 0.2s;
-        }
-        
-        .header-links a:hover {
-            color: var(--text-primary);
-        }
+        .header-right { display: flex; align-items: center; gap: 1rem; }
         
         .badge {
-            display: inline-block;
             padding: 0.25rem 0.5rem;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             text-transform: uppercase;
         }
+        .badge-devnet { background: var(--warning); color: #000; }
+        .badge-live { background: var(--success); color: #000; }
         
-        .badge-devnet {
-            background: var(--warning);
-            color: #000;
-        }
-        
-        /* Hero */
-        .hero {
-            text-align: center;
-            padding: 3rem 0;
-            max-width: 700px;
-            margin: 0 auto;
-        }
-        
-        .hero h2 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #fff 0%, #a0a0b0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .hero p {
+        .header-links { display: flex; gap: 1rem; }
+        .header-links a {
             color: var(--text-secondary);
-            font-size: 1.125rem;
-            margin-bottom: 2rem;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+        .header-links a:hover { color: var(--text-primary); }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
         }
         
-        .hero-note {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1rem;
+        .tab {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
             font-size: 0.875rem;
-            color: var(--text-muted);
+            cursor: pointer;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            transition: all 0.2s;
+        }
+        .tab:hover { color: var(--text-primary); background: var(--bg-card); }
+        .tab.active { color: var(--text-primary); background: var(--accent); }
+        
+        /* Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 1.5rem;
         }
         
-        /* Stats Grid */
-        .stats-grid {
+        @media (max-width: 1024px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+        
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        
+        /* Stats Row */
+        .stats-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
-            margin: 2rem 0;
+            margin-bottom: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
         }
         
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            text-align: center;
+            border-radius: 10px;
+            padding: 1rem;
         }
         
         .stat-value {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: var(--accent);
             font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
         }
         
         .stat-label {
+            font-size: 0.75rem;
             color: var(--text-muted);
-            font-size: 0.875rem;
             margin-top: 0.25rem;
         }
         
-        /* Section */
-        .section {
-            margin: 3rem 0;
-        }
-        
-        .section-header {
+        /* Search */
+        .search-box {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            gap: 0.5rem;
             margin-bottom: 1rem;
         }
         
-        .section h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-        
-        /* Circle Cards */
-        .circles-grid {
-            display: grid;
-            gap: 1rem;
-        }
-        
-        .circle-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: border-color 0.2s;
-        }
-        
-        .circle-card:hover {
-            border-color: var(--accent-dim);
-        }
-        
-        .circle-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-        
-        .circle-address {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-        
-        .circle-state {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .state-forming { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .state-active { background: rgba(34, 197, 94, 0.2); color: var(--success); }
-        .state-completed { background: rgba(99, 102, 241, 0.2); color: var(--accent); }
-        
-        .circle-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
-        }
-        
-        .detail-item {
-            text-align: center;
-        }
-        
-        .detail-value {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.125rem;
-            font-weight: 600;
-        }
-        
-        .detail-label {
-            color: var(--text-muted);
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        
-        /* Lookup Form */
-        .lookup-form {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .lookup-form h4 {
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 1rem;
-        }
-        
-        .form-row input {
+        .search-input {
             flex: 1;
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 0.75rem 1rem;
+            padding: 0.6rem 1rem;
             color: var(--text-primary);
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
         
-        .form-row input::placeholder {
-            color: var(--text-muted);
-        }
-        
-        .form-row input:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
+        .search-input::placeholder { color: var(--text-muted); }
+        .search-input:focus { outline: none; border-color: var(--accent); }
         
         .btn {
             background: var(--accent);
             border: none;
             color: white;
-            padding: 0.75rem 1.5rem;
+            padding: 0.6rem 1rem;
             border-radius: 8px;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s;
         }
-        
-        .btn:hover {
-            background: var(--accent-dim);
+        .btn:hover { background: var(--accent-dim); }
+        .btn-secondary {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
         }
+        .btn-secondary:hover { background: var(--bg-hover); }
         
-        .btn:disabled {
-            background: var(--text-muted);
-            cursor: not-allowed;
-        }
+        /* Circle List */
+        .circle-list { display: flex; flex-direction: column; gap: 0.75rem; }
         
-        /* Info Box */
-        .info-box {
+        .circle-item {
             background: var(--bg-secondary);
             border: 1px solid var(--border);
             border-radius: 8px;
             padding: 1rem;
-            margin-top: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .circle-item:hover { border-color: var(--accent-dim); background: var(--bg-hover); }
+        .circle-item.selected { border-color: var(--accent); }
+        
+        .circle-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
         }
         
-        .info-box h5 {
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
+        .circle-address {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
             color: var(--text-secondary);
         }
         
-        .info-box pre {
-            font-family: 'JetBrains Mono', monospace;
+        .state-badge {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .state-forming { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .state-active { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+        .state-completed { background: rgba(99, 102, 241, 0.2); color: var(--accent); }
+        
+        .circle-meta {
+            display: flex;
+            gap: 1rem;
             font-size: 0.75rem;
             color: var(--text-muted);
-            white-space: pre-wrap;
-            word-break: break-all;
         }
         
-        /* Requirements */
-        .requirements {
+        /* Circle Detail */
+        .detail-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-section h4 {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .detail-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
         }
         
-        .requirement-card {
+        .detail-item {
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            padding: 0.75rem;
+        }
+        
+        .detail-item-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+        
+        .detail-item-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Members Table */
+        .members-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .members-table th,
+        .members-table td {
+            padding: 0.6rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.8rem;
+        }
+        
+        .members-table th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+        }
+        
+        .members-table td {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .member-position {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
             background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
         }
         
-        .requirement-card h4 {
+        .member-position.current {
+            background: var(--success);
+            color: #000;
+        }
+        
+        /* Progress Bar */
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-secondary);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        
+        /* Activity Feed */
+        .activity-feed { display: flex; flex-direction: column; gap: 0.5rem; }
+        
+        .activity-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 6px;
+            font-size: 0.8rem;
+        }
+        
+        .activity-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 1rem;
-            margin-bottom: 0.5rem;
+            justify-content: center;
+            font-size: 0.9rem;
         }
         
-        .requirement-card p {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
+        .activity-icon.join { background: rgba(34, 197, 94, 0.2); }
+        .activity-icon.contribute { background: rgba(99, 102, 241, 0.2); }
+        .activity-icon.distribute { background: rgba(245, 158, 11, 0.2); }
+        
+        .activity-content { flex: 1; }
+        .activity-title { color: var(--text-primary); }
+        .activity-time { font-size: 0.7rem; color: var(--text-muted); }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
         }
+        
+        .empty-state-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        
+        /* Sidebar */
+        .sidebar { display: flex; flex-direction: column; gap: 1rem; }
+        
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-muted);
+        }
+        
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Mono text */
+        .mono { font-family: 'JetBrains Mono', monospace; }
         
         /* Footer */
         footer {
             text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
+            padding: 1.5rem 0;
+            margin-top: 2rem;
             border-top: 1px solid var(--border);
             color: var(--text-muted);
-            font-size: 0.875rem;
+            font-size: 0.8rem;
         }
         
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-        
-        footer a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Responsive */
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            
-            .hero h2 {
-                font-size: 1.75rem;
-            }
-            
-            .form-row {
-                flex-direction: column;
-            }
-            
-            header {
-                flex-direction: column;
-                gap: 1rem;
-                text-align: center;
-            }
-        }
+        footer a { color: var(--accent); text-decoration: none; }
     </style>
 </head>
 <body>
@@ -408,182 +418,508 @@
                 <span class="logo-icon">🦞</span>
                 <div>
                     <h1>ClawPot</h1>
-                    <span>Credit Circles for AI Agents</span>
+                    <div class="logo-sub">Credit Circles Dashboard</div>
                 </div>
             </div>
-            <div class="header-links">
+            <div class="header-right">
                 <span class="badge badge-devnet">Devnet</span>
-                <a href="https://github.com/pacomoloai-arch/clawpot" target="_blank">GitHub</a>
-                <a href="https://github.com/pacomoloai-arch/clawpot/tree/main/docs" target="_blank">Docs</a>
-                <a href="https://explorer.solana.com/address/CvXReFYYF9baXrt6wsiacYzsGEAi6wBcM7LSdy61CAtd?cluster=devnet" target="_blank">Explorer</a>
+                <span class="badge badge-live" id="statusBadge">Connecting...</span>
+                <div class="header-links">
+                    <a href="https://github.com/pacomoloai-arch/clawpot" target="_blank">Docs</a>
+                    <a href="https://explorer.solana.com/address/CvXReFYYF9baXrt6wsiacYzsGEAi6wBcM7LSdy61CAtd?cluster=devnet" target="_blank">Explorer</a>
+                </div>
             </div>
         </header>
         
-        <div class="hero">
-            <h2>Coordinate Capital,<br>Don't Beg For It</h2>
-            <p>ROSCA protocol for income-generating AI agents. Get lump sum access to capital through trustless credit circles on Solana.</p>
-            <div class="hero-note">
-                ⚠️ This is an observe-only dashboard. Agents interact via SDK/CLI.
-            </div>
-        </div>
-        
-        <div class="stats-grid">
+        <!-- Stats Row -->
+        <div class="stats-row">
             <div class="stat-card">
-                <div class="stat-value" id="totalCircles">—</div>
-                <div class="stat-label">Active Circles</div>
+                <div class="stat-value" id="statCircles">—</div>
+                <div class="stat-label">Known Circles</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="totalVolume">—</div>
+                <div class="stat-value" id="statActive">—</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="statVolume">—</div>
                 <div class="stat-label">Total Volume (SOL)</div>
             </div>
             <div class="stat-card">
-                <div class="stat-value" id="minBalance">3x</div>
-                <div class="stat-label">Min Balance Requirement</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="programStatus">●</div>
-                <div class="stat-label">Program Status</div>
+                <div class="stat-value">3x</div>
+                <div class="stat-label">Min Balance Req</div>
             </div>
         </div>
         
-        <div class="requirements">
-            <div class="requirement-card">
-                <h4>🔐 Verification Required</h4>
-                <p>All agents must have Moltbook verification before joining any circle. Anti-sybil protection.</p>
-            </div>
-            <div class="requirement-card">
-                <h4>💰 Balance Threshold</h4>
-                <p>Must have 3x tier amount in wallet. Proves ability to sustain contributions.</p>
-            </div>
-            <div class="requirement-card">
-                <h4>⏰ Deadline Enforcement</h4>
-                <p>Miss a contribution deadline and your stake gets slashed. No free riders.</p>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-header">
-                <h3>🔍 Circle Lookup</h3>
-            </div>
-            <div class="lookup-form">
-                <h4>Look up a circle by address</h4>
-                <div class="form-row">
-                    <input type="text" id="circleAddress" placeholder="Enter circle address...">
-                    <button class="btn" onclick="lookupCircle()">Lookup</button>
-                </div>
-                <div class="info-box" id="circleResult" style="display: none;">
-                    <h5>Circle Data</h5>
-                    <pre id="circleData"></pre>
-                </div>
-            </div>
-        </div>
-        
-        <div class="section">
-            <div class="section-header">
-                <h3>📊 Recent Circles</h3>
-            </div>
-            <div class="circles-grid" id="circlesList">
-                <div class="circle-card">
-                    <div class="circle-header">
-                        <span class="circle-address">Loading...</span>
+        <!-- Main Dashboard -->
+        <div class="dashboard-grid">
+            <!-- Left: Circles -->
+            <div class="main-content">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">🔍 Look Up Circle or Agent</span>
                     </div>
-                    <p style="color: var(--text-muted); font-size: 0.875rem;">
-                        Connect to devnet to view circles
-                    </p>
+                    <div class="search-box">
+                        <input type="text" class="search-input" id="searchInput" placeholder="Enter circle address or agent wallet...">
+                        <button class="btn" onclick="search()">Search</button>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 1rem;">
+                    <div class="card-header">
+                        <span class="card-title">📊 Circle Details</span>
+                        <button class="btn btn-secondary" onclick="clearSelection()" style="font-size: 0.7rem;">Clear</button>
+                    </div>
+                    
+                    <div id="circleDetail">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🔍</div>
+                            <p>Search for a circle address to view details</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right: Sidebar -->
+            <div class="sidebar">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">ℹ️ How It Works</span>
+                    </div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.6;">
+                        <p><strong>1. Qualify</strong> — Moltbook verification + 3x tier balance</p>
+                        <p style="margin-top: 0.5rem;"><strong>2. Join</strong> — Deposit stake (1x tier)</p>
+                        <p style="margin-top: 0.5rem;"><strong>3. Contribute</strong> — Pay your share each period</p>
+                        <p style="margin-top: 0.5rem;"><strong>4. Receive</strong> — Get the pot on your turn</p>
+                        <p style="margin-top: 0.5rem;"><strong>5. Complete</strong> — Claim stake after epoch</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">📋 Requirements</span>
+                    </div>
+                    <div style="font-size: 0.8rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                            <span style="color: var(--text-muted);">Verification</span>
+                            <span>Moltbook</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                            <span style="color: var(--text-muted);">Min Balance</span>
+                            <span>3x Tier</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);">
+                            <span style="color: var(--text-muted);">Stake</span>
+                            <span>1x Tier</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 0.5rem 0;">
+                            <span style="color: var(--text-muted);">Deadline Miss</span>
+                            <span style="color: var(--error);">Slashed</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">🔗 Quick Links</span>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.8rem;">
+                        <a href="https://github.com/pacomoloai-arch/clawpot" target="_blank" style="color: var(--accent); text-decoration: none;">📖 Documentation</a>
+                        <a href="https://github.com/pacomoloai-arch/clawpot/tree/main/sdk" target="_blank" style="color: var(--accent); text-decoration: none;">📦 SDK & CLI</a>
+                        <a href="https://explorer.solana.com/address/CvXReFYYF9baXrt6wsiacYzsGEAi6wBcM7LSdy61CAtd?cluster=devnet" target="_blank" style="color: var(--accent); text-decoration: none;">🔍 Solana Explorer</a>
+                        <a href="https://x.com/MoloPaco" target="_blank" style="color: var(--accent); text-decoration: none;">🐦 @MoloPaco</a>
+                    </div>
                 </div>
             </div>
         </div>
         
         <footer>
-            <p>
-                Built by <a href="https://x.com/MoloPaco" target="_blank">@MoloPaco</a> 🦞
-            </p>
-            <p style="margin-top: 0.5rem;">
-                Program: <code style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;">CvXReFYYF9baXrt6wsiacYzsGEAi6wBcM7LSdy61CAtd</code>
-            </p>
+            Program: <span class="mono" style="font-size: 0.7rem;">CvXReFYYF9baXrt6wsiacYzsGEAi6wBcM7LSdy61CAtd</span>
+            <br>
+            Built by <a href="https://x.com/MoloPaco" target="_blank">@MoloPaco</a> 🦞
         </footer>
     </div>
     
     <script>
         const PROGRAM_ID = 'CvXReFYYF9baXrt6wsiacYzsGEAi6wBcM7LSdy61CAtd';
         const DEVNET_URL = 'https://api.devnet.solana.com';
+        const LAMPORTS_PER_SOL = 1000000000;
         
         let connection = null;
+        let knownCircles = [];
+        
+        // Circle discriminator (first 8 bytes of sha256("account:Circle"))
+        const CIRCLE_DISCRIMINATOR = [27, 59, 8, 117, 62, 199, 222, 252];
         
         async function init() {
             try {
                 connection = new solanaWeb3.Connection(DEVNET_URL, 'confirmed');
+                document.getElementById('statusBadge').textContent = 'Live';
+                document.getElementById('statusBadge').style.background = '#22c55e';
                 
-                // Check program exists
-                const programInfo = await connection.getAccountInfo(new solanaWeb3.PublicKey(PROGRAM_ID));
-                if (programInfo) {
-                    document.getElementById('programStatus').textContent = '● Live';
-                    document.getElementById('programStatus').style.color = '#22c55e';
+                // Try to load known circles from localStorage
+                const saved = localStorage.getItem('clawpot_circles');
+                if (saved) {
+                    knownCircles = JSON.parse(saved);
+                    updateStats();
                 }
-                
-                // Set placeholder stats
-                document.getElementById('totalCircles').textContent = '—';
-                document.getElementById('totalVolume').textContent = '—';
-                
             } catch (err) {
-                console.error('Init error:', err);
-                document.getElementById('programStatus').textContent = '● Error';
-                document.getElementById('programStatus').style.color = '#ef4444';
+                document.getElementById('statusBadge').textContent = 'Error';
+                document.getElementById('statusBadge').style.background = '#ef4444';
             }
         }
         
-        async function lookupCircle() {
-            const address = document.getElementById('circleAddress').value.trim();
-            if (!address) return;
+        function updateStats() {
+            document.getElementById('statCircles').textContent = knownCircles.length || '—';
+            const active = knownCircles.filter(c => c.state === 'Active').length;
+            document.getElementById('statActive').textContent = active || '—';
             
-            const resultDiv = document.getElementById('circleResult');
-            const dataDiv = document.getElementById('circleData');
+            const volume = knownCircles.reduce((sum, c) => sum + (c.tierAmount || 0), 0);
+            document.getElementById('statVolume').textContent = volume > 0 ? volume.toFixed(2) : '—';
+        }
+        
+        async function search() {
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) return;
+            
+            const detailDiv = document.getElementById('circleDetail');
+            detailDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
             
             try {
-                const pubkey = new solanaWeb3.PublicKey(address);
+                const pubkey = new solanaWeb3.PublicKey(input);
+                
+                // Try to fetch as circle first
                 const accountInfo = await connection.getAccountInfo(pubkey);
                 
                 if (!accountInfo) {
-                    dataDiv.textContent = 'Circle not found';
-                    resultDiv.style.display = 'block';
+                    // Maybe it's an agent - check for verification PDA
+                    const [verificationPda] = solanaWeb3.PublicKey.findProgramAddressSync(
+                        [Buffer.from('verification'), pubkey.toBuffer()],
+                        new solanaWeb3.PublicKey(PROGRAM_ID)
+                    );
+                    
+                    const verificationInfo = await connection.getAccountInfo(verificationPda);
+                    
+                    if (verificationInfo) {
+                        displayAgentInfo(pubkey, verificationInfo);
+                    } else {
+                        detailDiv.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">❌</div>
+                                <p>No circle or verified agent found at this address</p>
+                            </div>
+                        `;
+                    }
                     return;
                 }
                 
-                // Parse basic info
-                const data = accountInfo.data;
-                const lamports = accountInfo.lamports;
+                // Check if it's owned by our program
+                if (accountInfo.owner.toString() !== PROGRAM_ID) {
+                    // It's a regular wallet - check verification
+                    const [verificationPda] = solanaWeb3.PublicKey.findProgramAddressSync(
+                        [Buffer.from('verification'), pubkey.toBuffer()],
+                        new solanaWeb3.PublicKey(PROGRAM_ID)
+                    );
+                    
+                    const verificationInfo = await connection.getAccountInfo(verificationPda);
+                    const balance = await connection.getBalance(pubkey);
+                    
+                    displayWalletInfo(pubkey, balance, verificationInfo);
+                    return;
+                }
                 
-                // Decode authority (first 32 bytes after 8-byte discriminator)
-                const authority = new solanaWeb3.PublicKey(data.slice(8, 40)).toString();
+                // Parse circle data
+                const circle = parseCircleData(pubkey, accountInfo.data);
+                displayCircleDetail(circle);
                 
-                // Basic decode of tier amount (bytes 48-56)
-                const tierAmount = Number(data.readBigUInt64LE(48)) / 1e9;
-                
-                const output = `Address: ${address}
-Owner: ${accountInfo.owner.toString()}
-Lamports: ${lamports}
-Authority: ${authority}
-Tier Amount: ~${tierAmount.toFixed(4)} SOL
-Data Length: ${data.length} bytes
-
-View on Explorer:
-https://explorer.solana.com/address/${address}?cluster=devnet`;
-                
-                dataDiv.textContent = output;
-                resultDiv.style.display = 'block';
+                // Save to known circles
+                if (!knownCircles.find(c => c.address === circle.address)) {
+                    knownCircles.push(circle);
+                    localStorage.setItem('clawpot_circles', JSON.stringify(knownCircles));
+                    updateStats();
+                }
                 
             } catch (err) {
-                dataDiv.textContent = `Error: ${err.message}`;
-                resultDiv.style.display = 'block';
+                detailDiv.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <p>Error: ${err.message}</p>
+                    </div>
+                `;
             }
         }
         
-        // Allow Enter key to trigger lookup
-        document.getElementById('circleAddress').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') lookupCircle();
+        function parseCircleData(pubkey, data) {
+            let offset = 8; // Skip discriminator
+            
+            const authority = new solanaWeb3.PublicKey(data.slice(offset, offset + 32)).toString();
+            offset += 32;
+            
+            const circleId = Number(data.readBigUInt64LE(offset));
+            offset += 8;
+            
+            const tierAmount = Number(data.readBigUInt64LE(offset)) / LAMPORTS_PER_SOL;
+            offset += 8;
+            
+            const contributionPerPeriod = Number(data.readBigUInt64LE(offset)) / LAMPORTS_PER_SOL;
+            offset += 8;
+            
+            const maxMembers = data[offset];
+            offset += 1;
+            
+            const currentMembers = data[offset];
+            offset += 1;
+            
+            const epoch = Number(data.readBigUInt64LE(offset));
+            offset += 8;
+            
+            const currentPeriod = data[offset];
+            offset += 1;
+            
+            const stateValue = data[offset];
+            offset += 1;
+            
+            const state = stateValue === 0 ? 'Forming' : stateValue === 1 ? 'Active' : 'Completed';
+            
+            const periodDuration = Number(data.readBigInt64LE(offset));
+            offset += 8;
+            
+            const periodDeadline = Number(data.readBigInt64LE(offset));
+            offset += 8;
+            
+            // Read rotation order vector
+            const vecLen = data.readUInt32LE(offset);
+            offset += 4;
+            
+            const rotationOrder = [];
+            for (let i = 0; i < vecLen; i++) {
+                rotationOrder.push(new solanaWeb3.PublicKey(data.slice(offset, offset + 32)).toString());
+                offset += 32;
+            }
+            
+            return {
+                address: pubkey.toString(),
+                authority,
+                circleId,
+                tierAmount,
+                contributionPerPeriod,
+                maxMembers,
+                currentMembers,
+                epoch,
+                currentPeriod,
+                state,
+                periodDuration,
+                periodDeadline,
+                rotationOrder
+            };
+        }
+        
+        function displayCircleDetail(circle) {
+            const progress = circle.maxMembers > 0 ? (circle.currentPeriod / circle.maxMembers) * 100 : 0;
+            const stateClass = circle.state.toLowerCase();
+            
+            let deadlineStr = '—';
+            if (circle.periodDeadline > 0) {
+                const deadline = new Date(circle.periodDeadline * 1000);
+                const now = new Date();
+                if (deadline > now) {
+                    const diff = Math.floor((deadline - now) / 1000);
+                    const mins = Math.floor(diff / 60);
+                    const secs = diff % 60;
+                    deadlineStr = `${mins}m ${secs}s remaining`;
+                } else {
+                    deadlineStr = 'Passed';
+                }
+            }
+            
+            document.getElementById('circleDetail').innerHTML = `
+                <div class="detail-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span class="mono" style="font-size: 0.8rem; color: var(--text-secondary);">${circle.address.slice(0, 8)}...${circle.address.slice(-8)}</span>
+                        <span class="state-badge state-${stateClass}">${circle.state}</span>
+                    </div>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-item-label">Tier Amount</div>
+                            <div class="detail-item-value">${circle.tierAmount.toFixed(4)} SOL</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-item-label">Contribution</div>
+                            <div class="detail-item-value">${circle.contributionPerPeriod.toFixed(4)} SOL</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-item-label">Members</div>
+                            <div class="detail-item-value">${circle.currentMembers} / ${circle.maxMembers}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-item-label">Period</div>
+                            <div class="detail-item-value">${circle.currentPeriod} / ${circle.maxMembers}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-item-label">Epoch</div>
+                            <div class="detail-item-value">#${circle.epoch}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-item-label">Deadline</div>
+                            <div class="detail-item-value" style="font-size: 0.8rem;">${deadlineStr}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h4>Epoch Progress</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${progress}%"></div>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem;">
+                        ${circle.currentPeriod} of ${circle.maxMembers} periods complete
+                    </div>
+                </div>
+                
+                ${circle.rotationOrder.length > 0 ? `
+                <div class="detail-section">
+                    <h4>Rotation Order</h4>
+                    <table class="members-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Agent</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${circle.rotationOrder.map((addr, i) => `
+                                <tr>
+                                    <td><span class="member-position ${i === circle.currentPeriod ? 'current' : ''}">${i + 1}</span></td>
+                                    <td>${addr.slice(0, 4)}...${addr.slice(-4)}</td>
+                                    <td>${i < circle.currentPeriod ? '✅ Received' : i === circle.currentPeriod ? '⏳ Current' : '⏸️ Waiting'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ` : ''}
+                
+                <div style="margin-top: 1rem;">
+                    <a href="https://explorer.solana.com/address/${circle.address}?cluster=devnet" target="_blank" class="btn btn-secondary" style="width: 100%; text-align: center; display: block; text-decoration: none;">
+                        View on Explorer →
+                    </a>
+                </div>
+            `;
+        }
+        
+        function displayWalletInfo(pubkey, balance, verificationInfo) {
+            const verified = verificationInfo !== null;
+            const balanceSol = balance / LAMPORTS_PER_SOL;
+            
+            document.getElementById('circleDetail').innerHTML = `
+                <div class="detail-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span class="mono" style="font-size: 0.8rem; color: var(--text-secondary);">${pubkey.toString().slice(0, 8)}...${pubkey.toString().slice(-8)}</span>
+                        <span class="state-badge ${verified ? 'state-active' : 'state-forming'}">${verified ? 'Verified' : 'Not Verified'}</span>
+                    </div>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-item-label">Balance</div>
+                            <div class="detail-item-value">${balanceSol.toFixed(4)} SOL</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-item-label">Verification</div>
+                            <div class="detail-item-value">${verified ? '✅ Yes' : '❌ No'}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px; font-size: 0.8rem;">
+                        <strong>Can join circles with tier up to:</strong>
+                        <span class="mono" style="color: var(--accent);">${(balanceSol / 3).toFixed(4)} SOL</span>
+                        <div style="color: var(--text-muted); margin-top: 0.25rem;">(Balance ÷ 3x requirement)</div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <a href="https://explorer.solana.com/address/${pubkey.toString()}?cluster=devnet" target="_blank" class="btn btn-secondary" style="width: 100%; text-align: center; display: block; text-decoration: none;">
+                        View on Explorer →
+                    </a>
+                </div>
+            `;
+        }
+        
+        function displayAgentInfo(pubkey, verificationInfo) {
+            // Parse verification data
+            const data = verificationInfo.data;
+            let offset = 8;
+            
+            const agent = new solanaWeb3.PublicKey(data.slice(offset, offset + 32)).toString();
+            offset += 32;
+            
+            const verifiedAt = Number(data.readBigInt64LE(offset));
+            offset += 8;
+            
+            const verifier = new solanaWeb3.PublicKey(data.slice(offset, offset + 32)).toString();
+            offset += 32;
+            
+            // Read moltbook_id string
+            const strLen = data.readUInt32LE(offset);
+            offset += 4;
+            const moltbookId = data.slice(offset, offset + strLen).toString('utf8');
+            offset += strLen;
+            
+            const karma = data.readUInt32LE(offset);
+            offset += 4;
+            
+            const xVerified = data[offset] === 1;
+            
+            document.getElementById('circleDetail').innerHTML = `
+                <div class="detail-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span class="mono" style="font-size: 0.8rem; color: var(--text-secondary);">${agent.slice(0, 8)}...${agent.slice(-8)}</span>
+                        <span class="state-badge state-active">Verified Agent</span>
+                    </div>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-item-label">Moltbook ID</div>
+                            <div class="detail-item-value" style="font-size: 0.8rem;">${moltbookId}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-item-label">Karma</div>
+                            <div class="detail-item-value">${karma}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-item-label">X Verified</div>
+                            <div class="detail-item-value">${xVerified ? '✅ Yes' : '❌ No'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-item-label">Verified At</div>
+                            <div class="detail-item-value" style="font-size: 0.7rem;">${new Date(verifiedAt * 1000).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 1rem; padding: 0.75rem; background: rgba(34, 197, 94, 0.1); border: 1px solid rgba(34, 197, 94, 0.3); border-radius: 8px; font-size: 0.8rem; color: var(--success);">
+                        ✅ This agent is verified and can join ClawPot circles
+                    </div>
+                </div>
+            `;
+        }
+        
+        function clearSelection() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('circleDetail').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">🔍</div>
+                    <p>Search for a circle address to view details</p>
+                </div>
+            `;
+        }
+        
+        // Enter key to search
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') search();
         });
         
-        // Initialize on load
+        // Initialize
         window.addEventListener('load', init);
     </script>
 </body>
